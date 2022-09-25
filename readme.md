@@ -50,7 +50,7 @@ Start:
 0xxxxxxxxxxx
 1xooo   ooox
 2xox x x xox
-4xo       ox
+3xo       ox
 4x x x x x x
 5x         x
 6x x x x x x
@@ -62,6 +62,7 @@ Start:
 
 ###algorithm
 ```
+Traverse all odd rows where the column also is odd. One cell at a time. 
 if cell is floor
     // check neighbours East, N, W, S
     // and set UNset cells
