@@ -44,7 +44,7 @@ Start:
 
 ```
  01234567890
-0xooooooooox
+0xooo   ooox
 1xox x x xox
 2xo       ox
 3x x x x x x
