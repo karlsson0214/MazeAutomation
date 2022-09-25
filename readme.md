@@ -37,22 +37,35 @@ x  x
 
 Cells
 ------------
-x - wall
-o - floor
-  - not decided yet
+* x - wall
+
+* o - floor
+
+* empty - not decided yet
+
 Start:
 
 ```
  01234567890
-0xooo   ooox
-1xox x x xox
-2xo       ox
-3x x x x x x
-4x         x
-5x x x x x x
-6 symmetric
-7
+0xxxxxxxxxxx
+1xooo   ooox
+2xox x x xox
+4xo       ox
+4x x x x x x
+5x         x
+6x x x x x x
+7 symmetric
 8
 9
 0
+```
+
+###algorithm
+```
+if cell is floor
+    // check neighbours East, N, W, S
+    // and set UNset cells
+    if 2 walls => add 2 floors
+    if 1 walls => randomize rest (wall or floor) but at least 2 floors
+    if 0 walls => randomize rest (wall or floor) but at least 2 floors (Will never happend with setup above)
 ```
