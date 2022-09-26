@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Runtime.ConstrainedExecution;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class CellMaze : MonoBehaviour
@@ -65,7 +67,7 @@ public class CellMaze : MonoBehaviour
             }
         }
         // build the rest
-        RandomWalls();
+        CleverRandomWalls();
         
     }
     private void ShowMaze()
@@ -106,5 +108,105 @@ public class CellMaze : MonoBehaviour
                 }
             }
         }
+    }
+    /// <summary>
+    /// Traverse all odd rows where the column also is odd. One cell at a time. 
+    /// if cell is floor
+    ///     // check neighbours East, N, W, S
+    ///     // and set UNset cells
+    ///     if 2 walls => add 2 floors
+    ///     if 1 walls => randomize rest(wall or floor) but at least 2 floors
+    ///     if 0 walls => randomize rest(wall or floor) but at least 2 floors(Will never happend with setup above)
+    /// </summary>
+    private void CleverRandomWalls()
+    {
+        for (int y = 1; y < YSIZE; y = y + 2)
+        {
+            for (int x = 1; x < XSIZE; x = x + 2)
+            {
+                // cell is floor
+                List<Coordinate> neighbours = new List<Coordinate>();
+                neighbours.Add(new Coordinate(x - 1, y));
+                neighbours.Add(new Coordinate(x + 1, y));
+                neighbours.Add(new Coordinate(x, y - 1));
+                neighbours.Add(new Coordinate(x, y + 1));
+
+                int noWalls = 0;
+                foreach(Coordinate cell in neighbours)
+                {
+                    if (maze[cell.x, cell.y] == WALL)
+                    {
+                        ++noWalls;
+                    }
+                    
+                }
+                Debug.Log("coordinate: " + x + ", " + y + "\nno Walls: " + noWalls);
+                if (noWalls == 2)
+                {
+                    foreach(Coordinate cell in neighbours)
+                    {
+                        if (maze[cell.x, cell.y] == EMPTY)
+                        {
+                            maze[cell.x, cell.y] = FLOOR;
+                        }
+                    }
+                }
+                else if (noWalls < 2)
+                {
+                    // remove walls from list
+                    for (int i = 0; i < neighbours.Count; ++i)
+                    {
+                        if (maze[neighbours[i].x, neighbours[i].y] == WALL)
+                        {
+                            neighbours.RemoveAt(i);
+                        }
+                    }
+                    while(neighbours.Count > 2)
+                    {
+                        // select neighbour
+                        int randomNeighbour = Random.Range(0, neighbours.Count);
+                        float probability = Random.Range(0, 1f);
+                        // probability of wall
+                        if (probability < 0.6f)
+                        {
+                            if (maze[neighbours[randomNeighbour].x, neighbours[randomNeighbour].y] == EMPTY)
+                            {
+                                // set value and remove from list
+                                maze[neighbours[randomNeighbour].x, neighbours[randomNeighbour].y] = WALL;
+                                neighbours.RemoveAt(randomNeighbour);
+                            }
+
+                        }
+                        else
+                        {
+                            if (maze[neighbours[randomNeighbour].x, neighbours[randomNeighbour].y] == EMPTY)
+                            {
+                                // set value and remove from list
+                                maze[neighbours[randomNeighbour].x, neighbours[randomNeighbour].y] = FLOOR;
+                                neighbours.RemoveAt(randomNeighbour);
+                            }
+                            
+                        }
+                    }
+                    // two cells left
+                    foreach (Coordinate cell in neighbours)
+                    {
+                        maze[cell.x, cell.y] = FLOOR;
+                    }
+                }
+                //maze[x, y] = FLOOR;
+            }
+        }
+    }
+}
+
+public class Coordinate
+{
+    public int x;
+    public int y;
+    public Coordinate(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
     }
 }
