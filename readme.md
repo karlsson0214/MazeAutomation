@@ -60,7 +60,7 @@ Start:
 0
 ```
 
-###algorithm
+### algorithm
 ```
 Traverse all odd rows where the column also is odd. One cell at a time. 
 if cell is floor
