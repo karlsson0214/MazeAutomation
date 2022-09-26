@@ -48,11 +48,11 @@ Start:
 ```
  01234567890
 0xxxxxxxxxxx
-1xooo   ooox
-2xox x x xox
-3xo       ox
+1xo o o o ox
+2x x x x x x
+3xo o o o ox
 4x x x x x x
-5x         x
+5xo o o o ox
 6x x x x x x
 7 symmetric
 8
