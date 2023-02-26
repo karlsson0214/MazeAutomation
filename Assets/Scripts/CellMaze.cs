@@ -1,14 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Runtime.ConstrainedExecution;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CellMaze : MonoBehaviour
 {
+    // objektvariabler
+    // fields
     public GameObject wallPrefab;
     public GameObject floorPrefab;
+    [SerializeField] private Button saveButton;
 
     private int[,] maze;
     //width and hight of maze: 9 + 2 n, where n = 0, 1, 2, ...
@@ -24,8 +29,40 @@ public class CellMaze : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Button button = saveButton.GetComponent<Button>();
+        button.onClick.AddListener(SaveClick);
         CreateMaze();
         ShowMaze();
+    }
+    public void SaveClick()
+    {
+        Debug.Log("Save pressed");
+        Texture2D texture = new Texture2D(XSIZE, YSIZE);
+        for (int x = 0; x < XSIZE; ++x)
+        {
+            for (int y = 0; y < YSIZE; ++y)
+            {
+                if (maze[x, y] == WALL)
+                {
+                    texture.SetPixel(x, y, UnityEngine.Color.black);
+                }
+                else if (maze[x, y] == FLOOR)
+                {
+                    texture.SetPixel(x, y, UnityEngine.Color.white);
+                }
+                else
+                {
+                    // error - should be either wall or floor
+                    texture.SetPixel(x, y, UnityEngine.Color.red);
+                }
+                
+            }
+        }
+        byte[] byteArray = texture.EncodeToPNG();
+        string path = Application.persistentDataPath;
+        path += "/maze.png";
+        Debug.Log("path: " + path);
+        File.WriteAllBytes(path, byteArray);
     }
 
     // Update is called once per frame
@@ -134,7 +171,7 @@ public class CellMaze : MonoBehaviour
                 int noWalls = 0;
                 foreach(Coordinate cell in neighbours)
                 {
-                    if (maze[cell.x, cell.y] == WALL)
+                    if (maze[cell.X, cell.Y] == WALL)
                     {
                         ++noWalls;
                     }
@@ -145,9 +182,9 @@ public class CellMaze : MonoBehaviour
                 {
                     foreach(Coordinate cell in neighbours)
                     {
-                        if (maze[cell.x, cell.y] == EMPTY)
+                        if (maze[cell.X, cell.Y] == EMPTY)
                         {
-                            maze[cell.x, cell.y] = FLOOR;
+                            maze[cell.X, cell.Y] = FLOOR;
                         }
                     }
                 }
@@ -156,7 +193,7 @@ public class CellMaze : MonoBehaviour
                     // remove walls from list
                     for (int i = 0; i < neighbours.Count; ++i)
                     {
-                        if (maze[neighbours[i].x, neighbours[i].y] == WALL)
+                        if (maze[neighbours[i].X, neighbours[i].Y] == WALL)
                         {
                             neighbours.RemoveAt(i);
                         }
@@ -169,20 +206,20 @@ public class CellMaze : MonoBehaviour
                         // probability of wall
                         if (probability < 0.6f)
                         {
-                            if (maze[neighbours[randomNeighbour].x, neighbours[randomNeighbour].y] == EMPTY)
+                            if (maze[neighbours[randomNeighbour].X, neighbours[randomNeighbour].Y] == EMPTY)
                             {
                                 // set value and remove from list
-                                maze[neighbours[randomNeighbour].x, neighbours[randomNeighbour].y] = WALL;
+                                maze[neighbours[randomNeighbour].X, neighbours[randomNeighbour].Y] = WALL;
                                 neighbours.RemoveAt(randomNeighbour);
                             }
 
                         }
                         else
                         {
-                            if (maze[neighbours[randomNeighbour].x, neighbours[randomNeighbour].y] == EMPTY)
+                            if (maze[neighbours[randomNeighbour].X, neighbours[randomNeighbour].Y] == EMPTY)
                             {
                                 // set value and remove from list
-                                maze[neighbours[randomNeighbour].x, neighbours[randomNeighbour].y] = FLOOR;
+                                maze[neighbours[randomNeighbour].X, neighbours[randomNeighbour].Y] = FLOOR;
                                 neighbours.RemoveAt(randomNeighbour);
                             }
                             
@@ -191,7 +228,7 @@ public class CellMaze : MonoBehaviour
                     // two cells left
                     foreach (Coordinate cell in neighbours)
                     {
-                        maze[cell.x, cell.y] = FLOOR;
+                        maze[cell.X, cell.Y] = FLOOR;
                     }
                 }
                 //maze[x, y] = FLOOR;
@@ -202,11 +239,25 @@ public class CellMaze : MonoBehaviour
 
 public class Coordinate
 {
-    public int x;
-    public int y;
+    // objektvariabler
+    // fields
+    private int x;
+    private int y;
+
+    // konstruktor
     public Coordinate(int x, int y)
     {
         this.x = x;
         this.y = y;
     }
+    // propert
+    public int X 
+    { 
+        get 
+        { 
+            return x; 
+        } 
+    }
+    public int Y { get { return y; } }
 }
+
